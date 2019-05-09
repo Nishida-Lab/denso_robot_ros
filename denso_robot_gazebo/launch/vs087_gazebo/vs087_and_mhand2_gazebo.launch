@@ -24,10 +24,10 @@
 	ns="/$(arg robot_name)" args="joint_state_controller arm_controller gripper_controller" />
 
   <!-- robot_state_publisher -->
-  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher"      -->
-  <!--       type="robot_state_publisher" respawn="false" output="screen"> -->
-    <!-- <remap from="/joint_states" to="/$(arg robot_name)/joint_states" /> -->
-  <!-- </node> -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+  type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="/joint_states" to="/$(arg robot_name)/joint_states" />
+  </node>
 
   <!-- joint_state_publisher -->
   <arg name="robot_joint_states" default="[/$(arg robot_name)/joint_states]"/>
