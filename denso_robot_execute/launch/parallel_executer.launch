@@ -1,0 +1,13 @@
+<launch>
+
+  <arg name="exe_speed_rate" default="1.0" />
+
+  <node pkg="denso_robot_execute" type="execute_action_server" name="execute_action_server" output="screen" />
+
+  <node pkg="denso_robot_execute" type="parallel_planner.py" name="parallel_planner" output="screen" />
+
+  <node pkg="denso_robot_execute" type="parallel_executor.py" name="parallel_executor" output="screen">
+    <param name="exe_speed_rate" type="double" value="$(arg exe_speed_rate)"/>
+  </node>
+
+</launch>
