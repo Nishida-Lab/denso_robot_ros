@@ -310,10 +310,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        HV8_0:
-          Value: true
-        HV8_0_point_1:
-          Value: true
         J1:
           Value: false
         J2:
@@ -330,17 +326,13 @@ Visualization Manager:
           Value: false
         hand_link:
           Value: false
-        jig_HV6_0:
-          Value: true
-        jig_HV6_0_HV8_0:
-          Value: true
-        jig_HV6_0_HV8_0_assemble_point:
-          Value: true
-        jig_HV6_0_HV8_1:
-          Value: true
-        jig_HV6_0_HV8_1_assemble_point:
-          Value: true
         mhand_body_link:
+          Value: false
+        mhand_finger_A:
+          Value: false
+        mhand_finger_B:
+          Value: false
+        mhand_finger_C:
           Value: false
         photoneo_center:
           Value: true
@@ -364,19 +356,15 @@ Visualization Manager:
                       J6:
                         hand_link:
                           mhand_body_link:
-                            {}
+                            mhand_finger_A:
+                              {}
+                            mhand_finger_B:
+                              {}
+                            mhand_finger_C:
+                              {}
           photoneo_center:
             photoneo_center_optical_frame:
-              HV8_0:
-                HV8_0_point_1:
-                  {}
-              jig_HV6_0:
-                jig_HV6_0_HV8_0:
-                  jig_HV6_0_HV8_0_assemble_point:
-                    {}
-                jig_HV6_0_HV8_1:
-                  jig_HV6_0_HV8_1_assemble_point:
-                    {}
+              {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -410,10 +398,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.129797608
+      Pitch: 0.264797539
       Target Frame: world
       Value: XYOrbit (rviz)
-      Yaw: 0.520393312
+      Yaw: 0.540393293
     Saved: ~
 Window Geometry:
   Displays:

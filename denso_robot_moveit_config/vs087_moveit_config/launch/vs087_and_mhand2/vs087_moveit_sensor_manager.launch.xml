@@ -1,3 +1,3 @@
 <launch>
-
+  <rosparam command="load" file="$(find vs087_moveit_config)/config/vs087_and_mhand2/sensors.yaml" />
 </launch>
