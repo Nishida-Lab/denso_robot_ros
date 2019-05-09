@@ -75,7 +75,7 @@ class ParallelExecuter(object):
         goal.start_state = plan.start_state
         # goal.start_state.joint_state.header.stamp = rospy.Time.now()
         goal.trajectory = plan.trajectory
-        rospy.logwarn(goal)
+        # rospy.logwarn(goal)
         self.client.send_goal(goal)
         self.client.wait_for_result()
 
