@@ -2,25 +2,37 @@ cmake_minimum_required(VERSION 2.8.3)
 project(denso_robot_execute)
 
 find_package(catkin REQUIRED COMPONENTS
+  genmsg
+  moveit_commander
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  pluginlib
   actionlib
   actionlib_msgs
-  control_msgs
+  moveit_msgs
   roscpp
   roslaunch
-  sensor_msgs
-  trajectory_msgs
   )
 
+add_message_files(DIRECTORY msg FILES Plan.msg)
+add_action_files(DIRECTORY action FILES ExecutePlan.action)
+generate_messages(DEPENDENCIES actionlib_msgs moveit_msgs)
+
 catkin_package(
-  CATKIN_DEPENDS actionlib_msgs
+  CATKIN_DEPENDS
+  roscpp
+  moveit_core
+  moveit_ros_planning_interface
+  message_runtime
+  actionlib_msgs
+  moveit_msgs
   )
 
 # Build
 add_definitions("-std=c++11")
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(execute_action_server src/execute_action_server.cpp)
 
