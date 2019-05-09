@@ -35,6 +35,7 @@ class ParallelPlanner(object):
         self.reqest_sub = rospy.Subscriber('/planning_request', PoseStamped, self.request_callback)
 
         # ========== Moveit init ========== #
+        self.dof = 6
         # moveit_commander init
         self.robot = moveit_commander.RobotCommander()
         self.arm = moveit_commander.MoveGroupCommander("arm")
@@ -42,44 +43,63 @@ class ParallelPlanner(object):
         self.planning_limitation_time = 5.0
         self.arm.set_planning_time(self.planning_limitation_time)
         self.start_state = self.robot.get_current_state()
-        print(self.start_state)
+        # for remove mhand2 finger link
+        self.start_state.joint_state.name = self.start_state.joint_state.name[:self.dof]
+        self.start_state.joint_state.position = self.start_state.joint_state.position[:self.dof]
 
         # ========== Plan publisher ======== #
         self.plan_pub = rospy.Publisher('/planning_result', Plan, queue_size=6)
 
         # ========== Solve IK service ======== #
-        rospy.wait_for_service('/compute_ik')
-        try:
-            self.ik_service = rospy.ServiceProxy('/compute_ik', GetPositionIK)
-        except rospy.ServiceException as e:
-            rospy.logerr('Activation service failed:{}'.format(e))
-
-            rospy.loginfo("Parallel Planner Initialized")
+        # rospy.wait_for_service('/compute_ik')
+        # try:
+        #     self.ik_service = rospy.ServiceProxy('/compute_ik', GetPositionIK)
+        # except rospy.ServiceException as e:
+        #     rospy.logerr('Activation service failed:{}'.format(e))
+        #
+        rospy.loginfo("Parallel Planner Initialized")
 
     # -------- Plannning & Execution -------- #
     def get_plan(self, target):
         # Set argument start state
+        self.start_state.joint_state.header.stamp = rospy.Time.now()
         self.arm.set_start_state(self.start_state)
 
         # Set goal pose
-        ik_req = PositionIKRequest()
-        ik_req.group_name = 'arm'
-        ik_req.avoid_collisions = True
-        ik_req.pose_stamped = target
-
-        try:
-            ret = self.ik_service(ik_req)
-        except rospy.ServiceException as e:
-            rospy.logerr('compute IK service failed:{}'.format(e))
-            return False
-
-        if not ret.solution.joint_state:
-            rospy.logerr('Could not obtein valid IK solution')
-            return False
-
-        ret.solution.joint_state.header.stamp = rospy.Time.now()
-        rospy.loginfo(ret.solution.joint_state)
-        self.arm.set_joint_value_target(ret.solution.joint_state)
+        # ik_req = PositionIKRequest()
+        # ik_req.group_name = 'arm'
+        # ik_req.robot_state = self.start_state
+        # ik_req.avoid_collisions = True
+        # ik_req.pose_stamped = target
+        #
+        # rospy.logerr(ik_req)
+        #
+        # try:
+        #     ret = self.ik_service(ik_req)
+        # except rospy.ServiceException as e:
+        #     rospy.logerr('compute IK service failed:{}'.format(e))
+        #     return False
+        #
+        # if not ret.solution.joint_state:
+        #     rospy.logerr('Could not obtein valid IK solution')
+        #     return False
+        #
+        # ret.solution.joint_state.header.stamp = rospy.Time.now()
+        # rospy.logerr(ret)
+        retry_count = 0
+        retry_limit = 10
+        ik_flag = False
+        while retry_count < retry_limit:
+            try:
+                self.arm.set_joint_value_target(target)
+                ik_flag = True
+                break
+            except:
+                retry_count += 1
+                rospy.logwarn("IK failed, retry...")
+        if ik_flag is False:
+            rospy.logerr("IK failed, abort...")
+        # self.arm.set_joint_value_target(ret.solution.joint_state)
 
         # plan
         plan = RobotTrajectory()
@@ -101,7 +121,7 @@ class ParallelPlanner(object):
         pub_msg.start_state = self.start_state
         pub_msg.start_state.joint_state.header.stamp = rospy.Time.now()
         pub_msg.trajectory = plan
-        rospy.logwarn(pub_msg)
+        # rospy.logwarn(pub_msg)
         self.plan_pub.publish(pub_msg)
         self.arm.clear_pose_targets()
         # return goal state from generated trajectory
