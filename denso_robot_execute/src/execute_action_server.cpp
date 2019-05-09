@@ -1,41 +1,58 @@
 #include <ros/ros.h>
 #include <ros/time.h>
-#include <trajectory_msgs/JointTrajectory.h>
-#include <actionlib/server/simple_action_server.h>
-#include <control_msgs/FollowJointTrajectoryAction.h>
 
-class ExecuteActionServer
+#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit_msgs/RobotState.h>
+#include <moveit_msgs/RobotTrajectory.h>
+
+#include <denso_robot_execute/ExecutePlanAction.h>
+#include <actionlib/server/simple_action_server.h>
+
+class ExecutePlanActionServer
 {
 protected:
   ros::NodeHandle nh_;
 
-  actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> as_;
+  actionlib::SimpleActionServer<denso_robot_execute::ExecutePlanAction> as_;
   std::string action_name_;
-  control_msgs::FollowJointTrajectoryResult result_;
-  trajectory_msgs::JointTrajectory goal_;
+  denso_robot_execute::ExecutePlanResult result_;
+  denso_robot_execute::ExecutePlanGoalConstPtr goal_;
+  moveit::planning_interface::MoveGroupInterface group_;
 
 public:
 
-  ExecuteActionServer(std::string name) :
+  ExecutePlanActionServer(std::string name, std::string movegroup_name) :
     as_(nh_, name, false),
-    action_name_(name)
+    action_name_(name),
+    group_(movegroup_name)
   {
-    as_.registerGoalCallback(boost::bind(&ExecuteActionServer::goalCB, this));
-
+    as_.registerGoalCallback(boost::bind(&ExecutePlanActionServer::goalCB, this));
     as_.start();
   }
 
   void goalCB()
   {
     ROS_INFO("Goal Recieived");
-    // Change first trajectory position to the current position
 
-    goal_ = as_.acceptNewGoal()->trajectory;
+    goal_ = as_.acceptNewGoal();
+
+    moveit::planning_interface::MoveGroupInterface::Plan plan;
+    plan.planning_time_ = goal_->planning_time;
+    plan.start_state_ = goal_->start_state;
+    plan.trajectory_ = goal_->trajectory;
+
+    group_.setStartState(plan.start_state_);
 
     // Send the Trajectory & Wait the Execution
     ROS_INFO("Moving...");
-
-    result_.error_code = result_.SUCCESSFUL;
+    if(group_.execute(plan))
+    {
+      result_.success = true;
+    }
+    else
+    {
+      result_.success = false;
+    }
     as_.setSucceeded(result_);
     ROS_INFO("Task Done !!");
   }
@@ -46,8 +63,13 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "execute_action_server");
 
-  ExecuteActionServer server(ros::this_node::getName());
-  ros::spin();
+  ExecutePlanActionServer server("execute_action", "arm");
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
+  while(ros::ok())
+  {
+    ros::spinOnce();
+  }
 
   return 0;
 }
