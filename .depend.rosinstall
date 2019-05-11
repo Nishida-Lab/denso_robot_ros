@@ -1,0 +1,4 @@
+- git:
+    local-name: denso_deps/mhand_ros_pkg
+    uri: https://github.com/Nishida-Lab/mhand_ros_pkg.git
+    version: master
