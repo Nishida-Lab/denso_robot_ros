@@ -36,6 +36,8 @@ include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(execute_action_server src/execute_action_server.cpp)
 
+add_dependencies(execute_action_server execute_action_server_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(execute_action_server ${catkin_LIBRARIES})
 
 # Install
