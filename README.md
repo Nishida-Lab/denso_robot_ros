@@ -1,4 +1,5 @@
-# denso_robot_ros
+# denso_robot_ros [![Build Status](https://travis-ci.com/Nishida-Lab/denso_robot_ros.svg?branch=kinetic-devel)](https://travis-ci.com/Nishida-Lab/denso_robot_ros) 
+
 
 ```
 $ cd your_ws/src
