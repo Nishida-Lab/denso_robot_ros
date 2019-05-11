@@ -49,7 +49,12 @@ foreach(modules execute_action_server)
   )
 endforeach(modules)
 
-foreach(dir config launch)
+catkin_install_python(PROGRAMS
+  scripts/parallel_executor.py
+  scripts/parallel_planner.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+foreach(dir launch scripts)
   install(DIRECTORY ${dir}/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
