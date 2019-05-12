@@ -36,6 +36,8 @@ include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(execute_action_server src/execute_action_server.cpp)
 
+add_dependencies(execute_action_server execute_action_server_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(execute_action_server ${catkin_LIBRARIES})
 
 # Install
@@ -47,7 +49,12 @@ foreach(modules execute_action_server)
   )
 endforeach(modules)
 
-foreach(dir config launch)
+catkin_install_python(PROGRAMS
+  scripts/parallel_executor.py
+  scripts/parallel_planner.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+foreach(dir launch scripts)
   install(DIRECTORY ${dir}/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
