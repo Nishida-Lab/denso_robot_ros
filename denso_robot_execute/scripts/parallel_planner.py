@@ -12,6 +12,7 @@ import rosparam
 # Moveit
 import moveit_commander
 # == Messages ==
+from operation_msgs.msg import PlanningRequest
 from geometry_msgs.msg import PoseStamped
 # for solve IK
 from moveit_msgs.msg import PositionIKRequest
@@ -32,7 +33,7 @@ class ParallelPlanner(object):
         self.task_q = []
 
         # ========= Subscriber ======== #
-        self.reqest_sub = rospy.Subscriber('/planning_request', PoseStamped, self.request_callback)
+        self.reqest_sub = rospy.Subscriber('/planning_request', PlanningRequest, self.request_callback)
 
         # ========== Moveit init ========== #
         self.dof = 6
@@ -91,7 +92,7 @@ class ParallelPlanner(object):
         ik_flag = False
         while retry_count < retry_limit:
             try:
-                self.arm.set_joint_value_target(target)
+                self.arm.set_joint_value_target(target.request)
                 ik_flag = True
                 break
             except:
@@ -121,6 +122,7 @@ class ParallelPlanner(object):
         pub_msg.start_state = self.start_state
         pub_msg.start_state.joint_state.header.stamp = rospy.Time.now()
         pub_msg.trajectory = plan
+        pub_msg.grasp = target.grasp
         # rospy.logwarn(pub_msg)
         self.plan_pub.publish(pub_msg)
         self.arm.clear_pose_targets()

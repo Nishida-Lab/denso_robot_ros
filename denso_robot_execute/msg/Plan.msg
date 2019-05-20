@@ -1,3 +1,4 @@
 float64 planning_time
 moveit_msgs/RobotState start_state
 moveit_msgs/RobotTrajectory trajectory
+bool grasp

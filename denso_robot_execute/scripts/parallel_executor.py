@@ -19,6 +19,9 @@ from moveit_msgs.msg import DisplayTrajectory
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
+# TODO: change operate spacific hand(mhand) to using generalized hand package
+from mhand_srvs.srv import Move, MoveRequest
+
 class ParallelExecuter(object):
 
     def __init__(self):
@@ -38,6 +41,14 @@ class ParallelExecuter(object):
 
         # task queue
         self.task_q = []
+
+        # TODO: change to get current hand state
+        self.is_grasp = False
+        rospy.loginfo('waiting for mhand services are activated.')
+        rospy.wait_for_service('/mhand/hand_open')
+        rospy.wait_for_service('/mhand/hand_close')
+        self.hand_open_srv = rospy.ServiceProxy('/mhand/hand_open', Move)
+        self.hand_close_srv = rospy.ServiceProxy('/mhand/hand_close', Move)
 
         rospy.loginfo("Parallel Executer Initialized")
 
@@ -78,6 +89,17 @@ class ParallelExecuter(object):
         # rospy.logwarn(goal)
         self.client.send_goal(goal)
         self.client.wait_for_result()
+
+        # TODO: change operate spacific hand(mhand) to using generalized hand package
+        if plan.grasp:
+            if self.is_grasp:
+                req = MoveRequest()
+                ret = self.hand_open_srv(req)
+                self.is_grasp = False
+            else:
+                req = MoveRequest()
+                ret = self.hand_close_srv(req)
+                self.is_grasp = True
 
         # Update the task queue
         self.task_q.pop(0)
