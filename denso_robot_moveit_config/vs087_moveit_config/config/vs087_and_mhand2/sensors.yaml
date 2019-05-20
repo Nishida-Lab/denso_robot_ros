@@ -1,8 +1,8 @@
 sensors:
 - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
   # point_cloud_topic: /photoneo_center/pointcloud
-  # point_cloud_topic: /filtered_cloud
-  point_cloud_topic: /robot_filtered_cloud
+  point_cloud_topic: /filtered_cloud
+  # point_cloud_topic: /robot_filtered_cloud
   max_range: 10
   padding_offset: 0.01
   padding_scale: 1.0
