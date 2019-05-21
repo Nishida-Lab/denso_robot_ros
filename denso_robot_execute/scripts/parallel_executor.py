@@ -65,6 +65,14 @@ class ParallelExecuter(object):
             tfs = points.time_from_start.to_sec()
             tfs /= self.exe_speed_rate
             points.time_from_start = rospy.Duration(tfs)
+            scaled_vel = []
+            scaled_acc = []
+            for vel in points.velocities:
+                scaled_vel.append(vel * self.exe_speed_rate)
+            points.velocities = tuple(scaled_vel)
+            for acc in points.accelerations:
+                scaled_acc.append(acc * self.exe_speed_rate * self.exe_speed_rate)
+            points.accelerations = tuple(scaled_acc)
 
         # Display the Trajectory
         start_state = JointState()
