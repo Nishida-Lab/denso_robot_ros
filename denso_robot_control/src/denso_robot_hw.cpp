@@ -42,11 +42,6 @@ namespace denso_robot_control
     memset(m_vel, 0, sizeof(m_vel));
     memset(m_eff, 0, sizeof(m_eff));
     memset(m_type, 0, sizeof(m_type));
-    memset(gm_cmd, 0, sizeof(gm_cmd)); // add
-    memset(gm_pos, 0, sizeof(gm_pos)); // add
-    memset(gm_vel, 0, sizeof(gm_vel)); // add
-    memset(gm_eff, 0, sizeof(gm_eff)); // add
-    memset(gm_type, 0, sizeof(gm_type)); // add
     m_joint.resize(JOINT_MAX);
 
     m_eng = boost::make_shared<DensoRobotCore>();
@@ -127,10 +122,7 @@ namespace denso_robot_control
         break;
     }
 
-    registerInterface(&m_JntStInterface);
-    registerInterface(&m_PosJntInterface);
-
-    if (!nh.getParam("girpper_joints", gm_robJoints))
+    if (!nh.getParam("gripper_joints", gm_robJoints))
     {                                                      // add
       ROS_WARN("Failed to get gripper_joints parameter."); // add
     }                                                      // add
@@ -141,30 +133,30 @@ namespace denso_robot_control
       char index[4] = {'A', 'B', 'C', '\0'};   // add
       ss << "finger_" << index[i] << "_joint"; // add
 
-      if (!nh.getParam(ss.str(), gm_type[i]))
+      if (!nh.getParam(ss.str(), m_type[i+m_robJoints]))
       {                                         // add
         ROS_WARN("Failed to get finger joint"); // add
-        gm_type[i] = 1;
+        m_type[i+m_robJoints] = 1;
       } // add
 
       hardware_interface::JointStateHandle state_handle(ss.str(),
-                                                        &gm_pos[i], &gm_vel[i], &gm_eff[i]); // add
-      gm_JntStInterface.registerHandle(state_handle);                                        // add
+                                                        &m_pos[i+m_robJoints], &m_vel[i+m_robJoints], &m_eff[i+m_robJoints]); // add
+      m_JntStInterface.registerHandle(state_handle);                                        // add
 
       hardware_interface::JointHandle pos_handle(
-          gm_JntStInterface.getHandle(ss.str()), &gm_cmd[i]); // add
-      gm_PosJntInterface.registerHandle(pos_handle);          // add
+          m_JntStInterface.getHandle(ss.str()), &m_cmd[i+m_robJoints]); // add
+      m_PosJntInterface.registerHandle(pos_handle);          // add
     }
 
-    int gripperGroup = 0;                            // add
+    int gripperGroup = 1;                            // add
     if (!nh.getParam("gripper_group", gripperGroup)) // add
     {
       ROS_INFO("Use gripper group 0."); // add
-      gripperGroup = 0;                 // add
+      gripperGroup = 1;                 // add
     }
 
-    registerInterface(&gm_JntStInterface); // add
-    registerInterface(&gm_PosJntInterface); // add
+    registerInterface(&m_JntStInterface); // add
+    registerInterface(&m_PosJntInterface); // add
 
     HRESULT hr = m_eng->Initialize();
     if(FAILED(hr)) {

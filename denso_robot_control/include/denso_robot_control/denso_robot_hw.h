@@ -87,18 +87,11 @@ namespace denso_robot_control
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
     hardware_interface::PositionJointInterface m_PosJntInterface;
-    hardware_interface::JointStateInterface gm_JntStInterface; // add
-    hardware_interface::PositionJointInterface gm_PosJntInterface; // add
-    double m_cmd[JOINT_MAX];
-    double m_pos[JOINT_MAX];
-    double m_vel[JOINT_MAX];
-    double m_eff[JOINT_MAX];
-    double gm_cmd[GRIPPER_JOINT_MAX]; // add
-    double gm_pos[GRIPPER_JOINT_MAX]; // add
-    double gm_vel[GRIPPER_JOINT_MAX]; // add
-    double gm_eff[GRIPPER_JOINT_MAX]; // add
-    int m_type[JOINT_MAX];
-    int gm_type[GRIPPER_JOINT_MAX]; // add
+    double m_cmd[JOINT_MAX+GRIPPER_JOINT_MAX];
+    double m_pos[JOINT_MAX+GRIPPER_JOINT_MAX];
+    double m_vel[JOINT_MAX+GRIPPER_JOINT_MAX];
+    double m_eff[JOINT_MAX+GRIPPER_JOINT_MAX];
+    int m_type[JOINT_MAX+GRIPPER_JOINT_MAX];
     std::vector<double> m_joint;
 
     DensoRobotCore_Ptr  m_eng;
