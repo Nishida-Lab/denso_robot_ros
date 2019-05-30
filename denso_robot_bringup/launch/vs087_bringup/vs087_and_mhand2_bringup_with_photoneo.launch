@@ -55,7 +55,7 @@
 
   <!-- photoneo_sensor: "photoneo_center" -->
   <!-- <node name="from_world_to_phoxi_test_static_tf" pkg="tf" type="static_transform_publisher" args="1.1547 0.2047 0.8946 -2.8982 0.9154 0.196 world photoneo_center 50" /> -->
-  <node name="from_world_to_phoxi_test_static_tf" pkg="tf" type="static_transform_publisher" args="1.155 0.1936 0.8993 -2.9053 0.8922 0.1839 world photoneo_center 50" />
+  <node name="from_world_to_phoxi_test_static_tf" pkg="tf" type="static_transform_publisher" args="1.155 0.2436 0.8993 -2.9053 0.8922 0.1839 world photoneo_center 50" />
   <node pkg="photoneo_localization" type="sensor_frame_broadcaster.py" name="photoneo_center_frame" output="screen">
     <param name="sensor_name" type="str" value="photoneo_center" />
   </node>
