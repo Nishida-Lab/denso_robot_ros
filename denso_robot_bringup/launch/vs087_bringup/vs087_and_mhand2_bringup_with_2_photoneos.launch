@@ -64,11 +64,13 @@
 
   <!-- 3/20 about position -->
   <!-- <node name="from_world_to_photoneo_left_static_tf" pkg="tf" type="static_transform_publisher" args="0.9004 1.2682 1.021 -2.0326 0.3749 0.0188 world photoneo_left 50" /> -->
+
   <!-- <node name="from_world_to_photoneo_left_static_tf" pkg="tf" type="static_transform_publisher" args="0.9098 1.194 1.1406 -2.0517 0.4594 -0.0283 world photoneo_left 50" /> -->
   <!-- 3/20 true value by manual calib -->
   <!-- <node name="from_world_to_photoneo_left_static_tf" pkg="tf" type="static_transform_publisher" args="0.8061 1.2749 1.0056 -1.9578 0.365 0.0722 world photoneo_left 50" /> -->
   <!-- 5/25 about position> -->
   <node name="from_world_to_photoneo_left_static_tf" pkg="tf" type="static_transform_publisher" args="0.6834 0.9364 0.8391 -1.8349 0.5324 0.2459 world photoneo_left 50" />
+
   <node pkg="photoneo_localization" type="sensor_frame_broadcaster.py" name="photoneo_left_frame" output="screen">
     <param name="sensor_name" type="str" value="photoneo_left" />
   </node>
