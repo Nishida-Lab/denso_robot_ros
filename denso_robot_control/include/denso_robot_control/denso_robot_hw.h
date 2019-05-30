@@ -48,6 +48,7 @@ using namespace denso_robot_core;
 #include <boost/thread.hpp>
 
 #define JOINT_MAX (8)
+#define GRIPPER_JOINT_MAX (3) // add
 
 namespace denso_robot_control
 {
@@ -81,16 +82,16 @@ namespace denso_robot_control
     void Callback_MiniIO(const Int32::ConstPtr& msg);
     void Callback_HandIO(const Int32::ConstPtr& msg);
     void Callback_SendUserIO(const UserIO::ConstPtr& msg);
-    void Callback_RecvUserIO(const UserIO::ConstPtr& msg);    
+    void Callback_RecvUserIO(const UserIO::ConstPtr& msg);
 
   private:
     hardware_interface::JointStateInterface m_JntStInterface;
     hardware_interface::PositionJointInterface m_PosJntInterface;
-    double m_cmd[JOINT_MAX];
-    double m_pos[JOINT_MAX];
-    double m_vel[JOINT_MAX];
-    double m_eff[JOINT_MAX];
-    int m_type[JOINT_MAX];
+    double m_cmd[JOINT_MAX+GRIPPER_JOINT_MAX];
+    double m_pos[JOINT_MAX+GRIPPER_JOINT_MAX];
+    double m_vel[JOINT_MAX+GRIPPER_JOINT_MAX];
+    double m_eff[JOINT_MAX+GRIPPER_JOINT_MAX];
+    int m_type[JOINT_MAX+GRIPPER_JOINT_MAX];
     std::vector<double> m_joint;
 
     DensoRobotCore_Ptr  m_eng;
@@ -99,7 +100,9 @@ namespace denso_robot_control
     DensoVariable_Ptr   m_varErr;
 
     std::string m_robName;
+    std::string gm_robName; // add
     int m_robJoints;
+    int gm_robJoints; // add
     int m_sendfmt;
     int m_recvfmt;
 

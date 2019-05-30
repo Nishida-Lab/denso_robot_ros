@@ -56,6 +56,7 @@ namespace denso_robot_control
     m_recvfmt   = DensoRobotRC8::RECVFMT_POSE_PJ
       | DensoRobotRC8::RECVFMT_MINIIO
       | DensoRobotRC8::RECVFMT_HANDIO;
+    gm_robJoints = 0; // add
   }
 
   DensoRobotHW::~DensoRobotHW()
@@ -121,8 +122,41 @@ namespace denso_robot_control
         break;
     }
 
-    registerInterface(&m_JntStInterface);
-    registerInterface(&m_PosJntInterface);
+    if (!nh.getParam("gripper_joints", gm_robJoints))
+    {                                                      // add
+      ROS_WARN("Failed to get gripper_joints parameter."); // add
+    }                                                      // add
+
+    for (int i = 0; i < gm_robJoints; i++)
+    {                                          // add
+      std::stringstream ss;                    // add
+      char index[4] = {'A', 'B', 'C', '\0'};   // add
+      ss << "finger_" << index[i] << "_joint"; // add
+
+      if (!nh.getParam(ss.str(), m_type[i+m_robJoints]))
+      {                                         // add
+        ROS_WARN("Failed to get finger joint"); // add
+        m_type[i+m_robJoints] = 1;
+      } // add
+
+      hardware_interface::JointStateHandle state_handle(ss.str(),
+                                                        &m_pos[i+m_robJoints], &m_vel[i+m_robJoints], &m_eff[i+m_robJoints]); // add
+      m_JntStInterface.registerHandle(state_handle);                                        // add
+
+      hardware_interface::JointHandle pos_handle(
+          m_JntStInterface.getHandle(ss.str()), &m_cmd[i+m_robJoints]); // add
+      m_PosJntInterface.registerHandle(pos_handle);          // add
+    }
+
+    int gripperGroup = 1;                            // add
+    if (!nh.getParam("gripper_group", gripperGroup)) // add
+    {
+      ROS_INFO("Use gripper group 0."); // add
+      gripperGroup = 1;                 // add
+    }
+
+    registerInterface(&m_JntStInterface); // add
+    registerInterface(&m_PosJntInterface); // add
 
     HRESULT hr = m_eng->Initialize();
     if(FAILED(hr)) {
@@ -200,7 +234,7 @@ namespace denso_robot_control
     m_subChangeMode = nh.subscribe<Int32>(
         "ChangeMode", 1, &DensoRobotHW::Callback_ChangeMode, this);
     m_pubCurMode = nh.advertise<Int32>("CurMode", 1);
-    
+
     hr = ChangeModeWithClearError(DensoRobotRC8::SLVMODE_SYNC_WAIT
 	| DensoRobotRC8::SLVMODE_POSE_J);
     if(FAILED(hr)) {
@@ -238,7 +272,7 @@ namespace denso_robot_control
     else
     {
       ros::NodeHandle nh;
-    
+
       if(m_sendfmt & DensoRobotRC8::SENDFMT_HANDIO)
       {
 	m_subHandIO = nh.subscribe<Int32>(
@@ -273,7 +307,7 @@ namespace denso_robot_control
 	m_pubRecvUserIO = nh.advertise<UserIO>("Read_RecvUserIO", 1);
       }
     }
-    
+
     return hr;
   }
 
@@ -315,7 +349,7 @@ namespace denso_robot_control
   void DensoRobotHW::read(ros::Time time, ros::Duration period)
   {
     boost::mutex::scoped_lock lockMode(m_mtxMode);
-    
+
     if(m_eng->get_Mode() == DensoRobotRC8::SLVMODE_NONE) {
       HRESULT hr = m_rob->ExecCurJnt(m_joint);
       if(FAILED(hr)) {
@@ -342,7 +376,7 @@ namespace denso_robot_control
   void DensoRobotHW::write(ros::Time time, ros::Duration period)
   {
     boost::mutex::scoped_lock lockMode(m_mtxMode);
-    
+
     if(m_eng->get_Mode() != DensoRobotRC8::SLVMODE_NONE) {
       std::vector<double> pose;
       pose.resize(JOINT_MAX);
@@ -389,7 +423,7 @@ namespace denso_robot_control
 	  UserIO msg;
 	  m_rob->get_RecvUserIO(msg);
 	  m_pubRecvUserIO.publish(msg);
-        }	
+        }
       }
       else if(FAILED(hr) && (hr != E_BUF_FULL)) {
         ROS_ERROR("Failed to write. (%X)", hr);
@@ -413,7 +447,7 @@ namespace denso_robot_control
   {
     m_rob->put_HandIO(msg->data);
   }
-  
+
   void DensoRobotHW::Callback_SendUserIO(const UserIO::ConstPtr& msg)
   {
     m_rob->put_SendUserIO(*msg.get());

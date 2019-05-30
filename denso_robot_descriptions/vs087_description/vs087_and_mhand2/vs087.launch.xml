@@ -8,4 +8,9 @@
 	<param name="joint_5" value="1"/>
 	<param name="joint_6" value="1"/>
 	<param name="arm_group" value="0"/>
+	<param name="gripper_joints" value="3"/>
+	<param name="finger_A_joint" value="1"/>
+	<param name="finger_B_joint" value="1"/>
+	<param name="finger_C_joint" value="1"/>
+	<param name="gripper_group" value="1"/>
 </launch>
